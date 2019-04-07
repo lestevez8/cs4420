@@ -1,0 +1,92 @@
+syntax = "proto2";
+option optimize_for = LITE_RUNTIME;
+
+message DeleteAppTask {
+    optional uint32 foobar = 1;
+}
+
+message ModifyResourceAllocTask {
+    optional uint32 foobar = 1;
+}
+message CreateAppTask {
+    optional uint32 foobar = 1;
+}
+
+message Task { // This structure will be changed later, dont worry now
+    enum Type {
+        CREATE_APP = 1;
+        DELETE_APP = 2;
+        MODIFY_RESOURCE_ALLOC = 3;
+    }
+    optional uint32 task_id = 1;
+    optional string server = 2;
+    optional Type task_type = 3;
+    
+    optional DeleteAppTask delete_app_task = 4;
+    optional CreateAppTask create_app_task = 5;
+    optional ModifyResourceAllocTask modify_resource_alloc_task = 6;
+}
+
+message Transaction {
+    repeated Task tasks = 1;
+    optional uint32 transaction_id = 2;
+}
+
+message Version {
+    optional uint32 some_field = 1;
+}
+
+message ServerReply {
+    optional uint32 some_field = 1;
+}
+
+message CommitReq {
+    optional uint32 task_id = 1;
+    optional Task task = 2;
+    optional Version version = 3;
+}
+
+message Agreement {
+    optional uint32 task_id = 1;
+    optional ServerReply server_reply = 2;  // This is the info that the server sends with the agreement
+}
+
+message Disagreement {
+    optional uint32 task_id = 1;
+    optional ServerReply server_reply = 2; // This is info that server sends when it disagrees, e.g. the reason for disagreement
+}
+
+message Commit {
+    optional uint32 task_id = 1;
+}
+
+message Ack {
+    optional uint32 task_id = 1;
+}
+
+message Abort {
+    optional uint32 task_id = 1;
+}
+
+message CommitProtocolMessage {
+    enum Type {
+      COMMIT_REQ = 1;
+      AGREEMENT = 2;
+      COMMIT = 3;
+      ACK = 4;
+      ABORT = 5;
+      DISAGREEMENT = 6;
+    }
+
+    optional CommitReq commit_req  = 1;
+    optional Agreement agreement = 2;
+    optional Commit commit = 3;
+    optional Ack ack = 4;
+    optional Abort abort = 5;
+    optional Disagreement disagreement = 6;
+  
+    optional Type type = 7;
+  
+    optional uint32 transaction_id = 8;
+	optional bool success = 9;
+}
